@@ -1,0 +1,26 @@
+{
+    "SlCol(ch2o)": {
+        "harpname": "HCHO_slant_column_number_density",
+        "units": "molecules cm-2",
+        "descrp": "slant column formaldehyde",
+        "comment": null
+    },
+    "SlCol(no2)": {
+        "harpname": "NO2_slant_column_number_density",
+        "units": "molecules cm-2",
+        "descrp": "slant column formaldehyde",
+        "comment": null
+    },
+    "SlCol(so2)": {
+        "harpname": "SO2_slant_column_number_density",
+        "units": "molecules cm-2",
+        "descrp": "slant column formaldehyde",
+        "comment": null
+    },
+    "Date & time (YYYYMMDDhhmmss)": {
+        "harpname": "datetime_start",
+        "units": "seconds since 2010-01-01",
+        "descrp": "start time of the measurement",
+        "comment": null
+    }
+}
