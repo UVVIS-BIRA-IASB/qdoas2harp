@@ -38,17 +38,21 @@ def cml():
     parser = argparse.ArgumentParser(description='give L1 file')
     # parser.add_argument('-file', dest='file', action='store', required=True,help=helpstr, default=None)
     parser.add_argument('-qdoasfile',dest='qdoasfile',help="qdoas file to be converted to harp compliant file")
-    parser.add_argument('-jsonfile')
+    parser.add_argument('-jsonfile',dest='jsonfile',help="json file with the mapping and attributes for the harp variables")
+    parser.add_argument('-outdir',dest='outdir',help="harp compliant qdoas output files per fitting window")
+
 
     args=parser.parse_args()
     qdoasfile=args.qdoasfile
     jsonfile=args.jsonfile
+    outdir=args.outdir
 
-    makeharp(qdoasfile,jsonfile)
+
+    makeharp(qdoasfile,jsonfile,outdir)
 
     
 
-def makeharp(qdfile,jsonfile):
+def makeharp(qdfile,jsonfile,outdir):
     groups=[ x for x in  list(set(nct.listallgroups(qdfile))) ]
     # group name Calib is fixed in qdoas, see engine/output_netcdf.cpp:31:const static string calib_subgroup_name = "Calib";
     maingroups=[x.split('/')[1] for x in groups]
@@ -60,7 +64,7 @@ def makeharp(qdfile,jsonfile):
     assert np.all(['Calib'==x for x in calibgroups]) or len(calibgroups==0)
     for fitwin in subgroups:
         qdoas_meta=get_qdoasmeta(qdfile,maingroup)
-        harpout=re.sub(r'.*/([^.]+)(.*)',r'\1_{}\2'.format(fitwin),qdfile)
+        harpout=outdir+re.sub(r'.*/([^.]+)(.*)',r'\1_{}\2'.format(fitwin),qdfile)
         # IPython.embed();exit()
         with Dataset(qdfile,'r') as ncqdoas, Dataset(harpout,'w') as ncharp:
             fitgr="/"+maingroup+"/"+fitwin+"/"
@@ -71,7 +75,6 @@ def makeharp(qdfile,jsonfile):
             time=ncharp.createDimension("time",time_scans)
             if '4' in ncqdoas[maingr].dimensions.keys(): #this corresponds to the independent_4 dim in harp for the ground pixel corners:
                 corners=ncharp.createDimension("independent_4",4)
-
             dd=qd2hp_mapping(jsonfile,mainvars+fitvars)
             # IPython.embed();exit()
 
@@ -95,9 +98,7 @@ def create_ncharpvar(dd,ncqdoas,ncharp):
                 # IPython.embed();exit()
                 nchpvar=ncharp.createVariable(hpobj.harpname,'f8', ("time","independent_4"),fill_value=False)
                 nanvar=nct.makemasked(ncqdoas[qdvar][:].reshape(-1,4))
-            
-                
-            
+                  
             if hpobj.comment!=None: nchpvar.comment=hpobj.comment
             if hpobj.descrp!=None: nchpvar.descrpition=hpobj.descrp 
             if hpobj.units!=None: nchpvar.units=hpobj.units 
