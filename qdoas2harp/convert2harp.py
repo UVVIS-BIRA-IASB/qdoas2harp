@@ -118,8 +118,13 @@ def create_ncharpvar(dd,ncqdoas,ncharp):
                 arr=np.full((tt.shape[0],),None)
                 for j in range(0,tt.shape[0]):
                     bb=[ int(tt[j,i]) for i in range(0,7)]
-                    #WARNING ref. time should be taken from the units attr. 
-                    arr[j]=(dt.datetime(*bb)-dt.datetime(2010,1,1,0,0,0)).total_seconds()+CountLeapSec(*bb[:3],2010)
+                    #WARNING ref. time should be taken from the units attr.
+                    # IPython.embed();exit()
+                    reftimestr=re.search("\d{4}-\d{2}-\d{2}",hpobj.units).group(0)
+                    assert reftimestr!=None, "check reference time format"
+                    reftime=dt.datetime.strptime(reftimestr,"%Y-%m-%d")
+                    arr[j]=(dt.datetime(*bb)-reftime).total_seconds()
+                    assert arr[j]>0, "reference time too late"
                     if hpobj.comment!=None: nchpvar.comment=hpobj.comment
                     if hpobj.descrp!=None: nchpvar.descrpition=hpobj.descrp 
                     if hpobj.units!=None: nchpvar.units=hpobj.units 
