@@ -92,16 +92,18 @@ def create_ncharpvar(dd,ncqdoas,ncharp):
         if ncqdoas[qdvar].dtype.char in ['f','d']:#needs conversion of fillvalues to nan
             
             if ncqdoas[qdvar].dimensions==('n_alongtrack', 'n_crosstrack'):
-                nchpvar=ncharp.createVariable(hpobj.harpname,'f8', ("time"),fill_value=False)
+                nchpvar=ncharp.createVariable(hpobj.harpname,'f4', ("time"),fill_value=False)
                 nanvar=nct.makemasked(ncqdoas[qdvar][:].flatten())
             elif ncqdoas[qdvar].dimensions==('n_alongtrack', 'n_crosstrack','4'):
-                # IPython.embed();exit()
-                nchpvar=ncharp.createVariable(hpobj.harpname,'f8', ("time","independent_4"),fill_value=False)
+                nchpvar=ncharp.createVariable(hpobj.harpname,'f4', ("time","independent_4"),fill_value=False)
                 nanvar=nct.makemasked(ncqdoas[qdvar][:].reshape(-1,4))
                   
             if hpobj.comment!=None: nchpvar.comment=hpobj.comment
-            if hpobj.descrp!=None: nchpvar.descrpition=hpobj.descrp 
-            if hpobj.units!=None: nchpvar.units=hpobj.units 
+            if hpobj.descrp!=None: nchpvar.description=hpobj.descrp 
+            if hpobj.units!=None: nchpvar.units=hpobj.units
+            if hpobj.valid_min!=None: nchpvar.valid_min=hpobj.valid_min 
+            if hpobj.valid_max!=None: nchpvar.valid_max=hpobj.valid_max 
+
             nchpvar[:]=nanvar
         else: #non floating point, integer point:
             if ncqdoas[qdvar].dimensions==('n_alongtrack','n_crosstrack'):
@@ -111,6 +113,12 @@ def create_ncharpvar(dd,ncqdoas,ncharp):
                     datatype='h'
                 nchpvar=ncharp.createVariable(hpobj.harpname,datatype, ("time"),fill_value=False)
                 nchpvar[:]=ncqdoas[qdvar][:].flatten()
+                if hpobj.comment!=None: nchpvar.comment=hpobj.comment
+                if hpobj.descrp!=None: nchpvar.description=hpobj.descrp 
+                if hpobj.units!=None: nchpvar.units=hpobj.units
+                if hpobj.valid_min!=None: nchpvar.valid_min=hpobj.valid_min 
+                if hpobj.valid_max!=None: nchpvar.valid_max=hpobj.valid_max 
+
             elif hpobj.harpname=="datetime_start": #exception for times. 
                 assert ncqdoas[qdvar].dimensions==('n_alongtrack', 'n_crosstrack','datetime')
                 nchpvar=ncharp.createVariable(hpobj.harpname,'f8', ("time"),fill_value=False)
@@ -126,8 +134,9 @@ def create_ncharpvar(dd,ncqdoas,ncharp):
                     arr[j]=(dt.datetime(*bb)-reftime).total_seconds()
                     assert arr[j]>0, "reference time too late"
                     if hpobj.comment!=None: nchpvar.comment=hpobj.comment
-                    if hpobj.descrp!=None: nchpvar.descrpition=hpobj.descrp 
-                    if hpobj.units!=None: nchpvar.units=hpobj.units 
+                    if hpobj.descrp!=None: nchpvar.description=hpobj.descrp 
+                    if hpobj.units!=None: nchpvar.units=hpobj.units
+                    
                 nchpvar[:]=arr
             else:
                     assert 0, "unknown variable for this conversion"

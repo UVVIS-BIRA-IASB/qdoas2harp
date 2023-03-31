@@ -44,6 +44,8 @@ class qd2hp_entry:
     units: str = field(kw_only=True,default=None)
     descrp: str = field(kw_only=True,default=None)
     comment: str = field(kw_only=True,default=None)
+    valid_min: float = field(kw_only=True,default=None)
+    valid_max: float = field(kw_only=True,default=None)
     
     def __repr__(self):
         return self.harpname
