@@ -46,9 +46,8 @@ def cml():
     qdoasfile=args.qdoasfile
     jsonfile=args.jsonfile
     outdir=args.outdir
-
-
     makeharp(qdoasfile,jsonfile,outdir)
+    
 
     
 
