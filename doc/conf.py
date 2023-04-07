@@ -6,9 +6,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'avltest'
-copyright = '2023, jonas'
-author = 'jonas'
+project = 'qdoas2harp'
+copyright = '2023'
+author = 'bira'
 release = '000'
 
 # -- General configuration ---------------------------------------------------
