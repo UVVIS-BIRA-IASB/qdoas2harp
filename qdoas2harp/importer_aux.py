@@ -32,20 +32,36 @@ def cml():
     parser.add_argument('-n','--dry-run',action="store_true",help="see what the importer would be doing")
 
     parser.add_argument('-molec',dest='molec',help="trace gas molecule")
-    parser.add_argument('-auxfile',dest='auxfile',help="file where aux. is in",default=None)
+    parser.add_argument('-auxdir',dest='auxdir',help="dir where aux. file is in",default=None)
 
 
     args=parser.parse_args()
     l2file=args.l2file 
-    auxfile=args.auxfile
+    auxdir=args.auxdir
     molec=args.molec
     assert molec in MOLEC_L2.keys()
-    if args.dry_run:
-        print(give_auxfilename(l2file,molec))
-    else:
-        assert len(glob.glob(os.path.dirname(auxfile)+"/"+give_auxfilename(l2file,molec)))==1
-        retrieve_auxvars(l2file,auxfile)
-    
+    if os.path.isdir(l2file):
+        if args.dry_run:
+            print("Aux. file that will be used for l2file :\n ")
+        for l2f in glob.glob(l2file+"/*"):
+            if args.dry_run:
+                 print("{} ----> {}".format(l2f,give_auxfilename(l2f,molec)))
+            else:
+                assert len(glob.glob(auxdir+"/"+give_auxfilename(l2f,molec)))==1
+                auxfile=glob.glob(auxdir+"/"+give_auxfilename(l2f,molec))[0]
+                print("{} ----> {}".format(l2f,auxfile))
+
+                retrieve_auxvars(l2f,auxfile)
+    else: #one qdoas l2 file is provided
+        if args.dry_run:
+            print("Aux. file that will be used for l2file :\n ")
+            print("{} ----> {}".format(l2file,give_auxfilename(l2file,molec)))
+
+        else:
+            assert len(glob.glob(auxdir+"/"+give_auxfilename(l2file,molec)))==1
+            auxfile=glob.glob(auxdir+"/"+give_auxfilename(l2file,molec))[0]
+            retrieve_auxvars(l2file,auxfile)
+                
             
     
     

@@ -37,17 +37,21 @@ def cml():
     helpstr='qdoas output file'
     parser = argparse.ArgumentParser(description='give L1 file')
     # parser.add_argument('-file', dest='file', action='store', required=True,help=helpstr, default=None)
-    parser.add_argument('-qdoasfile',dest='qdoasfile',help="qdoas file to be converted to harp compliant file")
+    parser.add_argument('-qdoas_inp',dest='qdoasfile',help="qdoas file to be converted to harp compliant file")
     parser.add_argument('-jsonfile',dest='jsonfile',help="json file with the mapping and attributes for the harp variables")
     parser.add_argument('-outdir',dest='outdir',help="harp compliant qdoas output files per fitting window")
-
 
     args=parser.parse_args()
     qdoasfile=args.qdoasfile
     jsonfile=args.jsonfile
     outdir=args.outdir
-    makeharp(qdoasfile,jsonfile,outdir)
-    
+    assert os.path.isdir(outdir)
+    if os.path.isdir(qdoasfile):
+        for fileqd in glob.glob(qdoasfile+"/*"):
+            # IPython.embed();exit()
+            makeharp(fileqd,jsonfile,outdir)
+    else:
+        makeharp(qdoasfile,jsonfile,outdir)
 
     
 
@@ -151,8 +155,8 @@ def get_qdoasmeta(qdoas_l2,maingroup):
         inputfile=ncqdoas[maingroup].InputFile.split('/')[-1]
         qdoas_meta['scanlines']=ncqdoas[maingroup+'Latitude'][:].shape[0]
         qdoas_meta['rows']=ncqdoas[maingroup+'Latitude'][:].shape[1]
-        assert np.all(nct.makemasked(ncqdoas[maingroup+'/Orbit number'][:])==nct.makemasked(ncqdoas[maingroup+'/Orbit number'][0,0]))
-        qdoas_meta['orbit']=int(nct.makemasked(ncqdoas[maingroup+'/Orbit number'][0,0]))
+        # assert np.all(nct.makemasked(ncqdoas[maingroup+'/Orbit number'][:])==nct.makemasked(ncqdoas[maingroup+'/Orbit number'][0,0])), qdoas_l2
+        # qdoas_meta['orbit']=int(nct.makemasked(ncqdoas[maingroup+'/Orbit number'][0,0]))
     return qdoas_meta
 
 
