@@ -29,10 +29,10 @@ def cml():
     parser = argparse.ArgumentParser(description='give L1 file')
     # parser.add_argument('-file', dest='file', action='store', required=True,help=helpstr, default=None)
     parser.add_argument(dest='l2file',help="adding cloud parameters")
-    parser.add_argument('-n','--dry-run',action="store_true",help="see what the importer would be doing")
+    # parser.add_argument('-n','--dry-run',action="store_true",help="see what the importer would be doing")
 
-    parser.add_argument('-molec',dest='molec',help="trace gas molecule")
-    parser.add_argument('-auxdir',dest='auxdir',help="dir where aux. file is in",default=None)
+    parser.add_argument('--molec',dest='molec',help="trace gas molecule",required=True)
+    parser.add_argument('--auxdir',dest='auxdir',help="dir where aux. file is in",default=None)
 
 
     args=parser.parse_args()

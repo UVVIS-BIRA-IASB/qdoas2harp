@@ -17,6 +17,12 @@
         "descrp": "slant column formaldehyde",
         "comment": null
     },
+	"SlCol(bro)": {
+        "harpname": "BrO_column_number_density",
+        "units": "molecules cm-2",
+        "descrp": "slant column bromine oxide",
+        "comment": null
+    },
     "Date & time (YYYYMMDDhhmmss)": {
         "harpname": "datetime_start",
         "units": "seconds since 2010-01-01",
@@ -70,5 +76,21 @@
 		"valid_min":0.0,
 		"valid_max":180.0,
         "comment": null
-    }
+    },
+	"latitude": {
+        "harpname": "latitude",
+        "units": "degree_north",
+        "descrp": "latitude of the ground pixel center (WGS84)",
+		"valid_min":-90.0,
+		"valid_max":90.0,
+        "comment": null
+    },
+	"longitude": {
+        "harpname": "longitude",
+        "units": "degree_east",
+        "descrp": "longitude of the ground pixel center (WGS84)",
+		"valid_min":-180.0,
+		"valid_max":180.0,
+        "comment": null
+    },
 }
