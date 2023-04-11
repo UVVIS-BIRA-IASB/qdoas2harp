@@ -1,6 +1,8 @@
 .. contents::
    :depth: 2
-..
+
+
+.. _mappingref:
 
 Mapping of qdoas names
 =======================
