@@ -14,7 +14,7 @@ from attr import define,  Factory
 import json
 
 
-exclude_qdoasvar=['Calib/','Spec No','Spike removal','Orbit number','Stretch(Spectrum)','Err Stretch(Spectrum)']
+exclude_qdoasvar=['Calib/','Spec No','Spike removal','Orbit number','Stretch(Spectrum)','Err Stretch(Spectrum)','Day number','Year','Fractional time' ]
 
 
 def qd2hp_mapping(jsonfile, qd_vars):

@@ -40,7 +40,6 @@ def cml():
     parser.add_argument('-qdoas_inp',dest='qdoasfile',help="qdoas file to be converted to harp compliant file")
     parser.add_argument('-jsonfile',dest='jsonfile',help="json file with the mapping and attributes for the harp variables")
     parser.add_argument('-outdir',dest='outdir',help="harp compliant qdoas output files per fitting window")
-
     args=parser.parse_args()
     qdoasfile=args.qdoasfile
     jsonfile=args.jsonfile
@@ -48,7 +47,6 @@ def cml():
     assert os.path.isdir(outdir)
     if os.path.isdir(qdoasfile):
         for fileqd in glob.glob(qdoasfile+"/*"):
-            # IPython.embed();exit()
             makeharp(fileqd,jsonfile,outdir)
     else:
         makeharp(qdoasfile,jsonfile,outdir)
@@ -78,6 +76,8 @@ def makeharp(qdfile,jsonfile,outdir):
             time=ncharp.createDimension("time",time_scans)
             ncharp.Conventions='HARP-1.0'
             ncharp.L1_InputFile=ncqdoas[maingr].InputFile.split('/')[-1]
+            # IPython.embed();exit()
+
             if '4' in ncqdoas[maingr].dimensions.keys(): #this corresponds to the independent_4 dim in harp for the ground pixel corners:
                 corners=ncharp.createDimension("independent_4",4)
             dd=qd2hp_mapping(jsonfile,mainvars+fitvars)
@@ -93,14 +93,13 @@ def create_ncharpvar(dd,ncqdoas,ncharp):
         print(hpobj)
         assert ncqdoas[qdvar].dtype.char in ['f','d','h','s','b','B','c','i','l','H','I']
         if ncqdoas[qdvar].dtype.char in ['f','d']:#needs conversion of fillvalues to nan
-            
+            # IPython.embed();exit()
             if ncqdoas[qdvar].dimensions==('n_alongtrack', 'n_crosstrack'):
                 nchpvar=ncharp.createVariable(hpobj.harpname,'f4', ("time"),fill_value=False)
                 nanvar=nct.makemasked(ncqdoas[qdvar][:].flatten())
             elif ncqdoas[qdvar].dimensions==('n_alongtrack', 'n_crosstrack','4'):
-                nchpvar=ncharp.createVariable(hpobj.harpname,'f4', ("time","independent_4"),fill_value=False)
+                nchpvar=ncharp.createVariable(hpobj.harpname,'f4',("time","independent_4"),fill_value=False)
                 nanvar=nct.makemasked(ncqdoas[qdvar][:].reshape(-1,4))
-                  
             if hpobj.comment!=None: nchpvar.comment=hpobj.comment
             if hpobj.descrp!=None: nchpvar.description=hpobj.descrp 
             if hpobj.units!=None: nchpvar.units=hpobj.units
@@ -125,7 +124,15 @@ def create_ncharpvar(dd,ncqdoas,ncharp):
             elif hpobj.harpname=="datetime_start": #exception for times. 
                 assert ncqdoas[qdvar].dimensions==('n_alongtrack', 'n_crosstrack','datetime')
                 nchpvar=ncharp.createVariable(hpobj.harpname,'f8', ("time"),fill_value=False)
-                tt=nct.makemasked(ncqdoas[qdvar][:]).reshape(-1,ncqdoas[qdvar].shape[-1])
+
+                tt=nct.makemasked(ncqdoas[qdvar][:])
+                
+                #bug in qdoas that some times are fillvalues for some rows>0, temporary solution is to take the times from rows=0, since times for all rows is the same. 
+                idxnan=np.nonzero(np.isnan(tt))
+                if idxnan:
+                    idxnan2=(idxnan[0],np.zeros((len(idxnan[1]),),dtype=np.int32),idxnan[2])
+                    tt[idxnan]=tt[idxnan2]
+                tt=tt.reshape(-1,ncqdoas[qdvar].shape[-1])
                 arr=np.full((tt.shape[0],),None)
                 for j in range(0,tt.shape[0]):
                     bb=[ int(tt[j,i]) for i in range(0,7)]

@@ -27,18 +27,15 @@ def makemasked(arr):
 
 def listallgroups(file):
  
-    if( isinstance(file,str)):
-        if (not  os.path.exists(file)): # check if the file exists.
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), file)
-        try:
-            datset= Dataset(file,'r',format="netCDF4")
-        except:
-            print("cannot open file")
-            datset.close()
-            assert 0
-    else:
-        datset=file
-
+    if (not  os.path.exists(file)): # check if the file exists.
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), file)
+    try:
+        datset= Dataset(file,'r',format="netCDF4")
+    except:
+        print("cannot open file")
+        datset.close()
+        assert 0
+   
     varlist=[]             
     for var in __walktree__(datset):
         for var2 in var:

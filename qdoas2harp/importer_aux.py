@@ -41,10 +41,10 @@ def cml():
     molec=args.molec
     assert molec in MOLEC_L2.keys()
     if os.path.isdir(l2file):
-        if args.dry_run:
-            print("Aux. file that will be used for l2file :\n ")
+        # if args.dry_run:
+            # print("Aux. file that will be used for l2file :\n ")
         for l2f in glob.glob(l2file+"/*"):
-            if args.dry_run:
+            if auxdir==None:
                  print("{} ----> {}".format(l2f,give_auxfilename(l2f,molec)))
             else:
                 assert len(glob.glob(auxdir+"/"+give_auxfilename(l2f,molec)))==1
@@ -53,7 +53,7 @@ def cml():
 
                 retrieve_auxvars(l2f,auxfile)
     else: #one qdoas l2 file is provided
-        if args.dry_run:
+        if auxdir==None:
             print("Aux. file that will be used for l2file :\n ")
             print("{} ----> {}".format(l2file,give_auxfilename(l2file,molec)))
 
@@ -66,7 +66,7 @@ def cml():
     
     
 def give_auxfilename(l2file,molec):
-    
+    # IPython.embed();exit()
     with nc.Dataset(l2file,'r') as ncfile:
         l1used=ncfile.L1_InputFile
     pp=re.search(r"S5P_(?P<proc>[A-Z]{4})_L1B_RA_BD\d_(?P<start>\d{8}T\d{6})_(?P<end>\d{8}T\d{6})_(?P<orbit>\d{5})_(?P<num>\d{2}).*",l1used)
