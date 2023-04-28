@@ -24,7 +24,6 @@ molecule_fullname={'HCHO': 'formaldehyde',
 
 def qd2hp_mapping(qd_vars,slcol_dict):
     '''qd_vars  contains variables names used in qdoas without the groups prepended.'''
-
     qd2hp_dict={}
     assert np.all([slcol_dict[x] in molecule_fullname.keys() for x in slcol_dict.keys()]),"wrong molecule name"
     mapping=readconfig(mapping_file)
@@ -43,11 +42,7 @@ def qd2hp_mapping(qd_vars,slcol_dict):
             molecule=re.search("SlErr\((.*)\)",qdvar).group(1)
             if qdoas_name in slcol_dict.keys():
                 qd2hp_dict[qdvar_path]=qd2hp_entry.create_from_slerr(slcol_dict[qdoas_name])
-    
-
     return qd2hp_dict
-
-
 
 @define(repr=False)
 class qd2hp_entry:

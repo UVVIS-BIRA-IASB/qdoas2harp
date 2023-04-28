@@ -33,13 +33,11 @@ def cml():
     parser = argparse.ArgumentParser(description='give L1 file')
     # parser.add_argument('-file', dest='file', action='store', required=True,help=helpstr, default=None)
     parser.add_argument('-qdoas_inp',dest='qdoasfile',help="qdoas file to be converted to harp compliant file")
-    parser.add_argument('-jsonfile',dest='jsonfile',help="json file with the mapping and attributes for the harp variables")
     parser.add_argument('-outdir',dest='outdir',help="harp compliant qdoas output files per fitting window")
-    parser.add_argument('-slcol', default=[], nargs='+')
+    parser.add_argument('-slcol', nargs=1)
     # IPython.embed();exit()
     args=parser.parse_args()
     qdoasfile=args.qdoasfile
-    jsonfile=args.jsonfile
     outdir=args.outdir
     slcol=args.slcol
     # IPython.embed();exit()
