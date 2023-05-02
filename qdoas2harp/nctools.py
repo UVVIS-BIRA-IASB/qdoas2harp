@@ -14,7 +14,7 @@ def listallgroups(file):
     if (not  os.path.exists(file)): # check if the file exists.
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), file)
     try:
-        ncfile= Dataset(file,'r',format="netCDF4")
+        ncfile= nc.Dataset(file,'r',format="netCDF4")
     except:
         assert 0,"Cannot open file"
     varlist=[]             
@@ -35,18 +35,18 @@ def listallvar(file):
         print("no netcdf4 file :" + file + '\n')
         assert 0
     try:
-        ncfile= Dataset(file,'r',format="netCDF4")
+        ncfile= nc.Dataset(file,'r',format="netCDF4")
     except:
         assert 0,"Cannot open file"
     varlist=[]
-    for var in __walktree__(datset):
+    for var in __walktree__(ncfile):
         for var2 in var:
             for varr in var2.variables:
                 varlist.append(var2.path+"/"+varr)
     ncfile.close()
     if ncfile.groups==collections.OrderedDict():
         assert len(varlist)==0
-        varlist=list(datset.variables.keys())
+        varlist=list(ncfile.variables.keys())
     return  varlist
 
 

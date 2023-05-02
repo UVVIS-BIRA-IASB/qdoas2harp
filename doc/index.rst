@@ -3,16 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to qdoas2harp documentation!
-===================================
+qdoas2harp documentation!
+==========================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    usage.rst
    main.rst
+   main_aux.rst
    tools.rst
+   limit.rst
+   
    
 Indices and tables
 ==================

@@ -1,8 +1,11 @@
-Qdoas to Harp Variables
-=======================
+Create Harp compliant qdoas output.
+====================================
 
-The aim of the qdoas2harp tool is to facilitate the post processing of a qdoas file. Many functionalities of HARP (https://stcorp.github.io/harp/doc/html/index.html) can be used on such a harp compliant output format. One very useful scenario is when
-one want to do some gridding on a qdoas file. Moreover many L2 formats can already be converted to such a Harp format.  Also, the BeAMF tool assumes that an input file is in the Harp format.
+Layout of qdoas file
+-----------------------
+
+A qdoas file consist typically out of a main group with variables such as geolocations, time, ... . The subgroup contains the results of a doas retrieval.  Note that the name of main and subgroup can be freely chosen in qdoas. 
+
 Below in picture :numref:`qdoasview`  a typical qdoas layout is shown. 
 
 ..  figure:: ../figs/fig1.png
@@ -13,17 +16,22 @@ Below in picture :numref:`qdoasview`  a typical qdoas layout is shown.
 
    qdoas view
 
-   ::
 
-Steps to evolve to a harp compliant qdoas output:
------------------------------------------------------------
 
-* Removing hdf5 groups. Thereby splitting the different groups from different fitting windows into multiple files. 
-* Squashing pixels from slant columns (typically scanlines x rows) into the time dimension
-* Adding main attribute 'HARP-1.0'
-* Transform the qdoas variable where a harp equivalent name exists.  (http://stcorp.github.io/harp/doc/html/conventions/variable_names.html and :ref:`mappingref`) 
-   
+Qdoas to Harp mapping
+----------------------
 
+A first application is to use the HARP functionalities on a qdoas output file. Therefore we perform some simplifications:
+
+* We split the subgroup into separate files and copy the output in another directory with a filename that gets the suffix of the original qdoas file.  
+* geolocations are kept in every output file. A harp  variable is created according to the conventions specified in http://stcorp.github.io/harp/doc/html/conventions/variable_names.html. 
+* One Slant column of interest is chosen. (see :ref:`qdref` for how this is done in practice). Currently only one slant column is kept, because the retrieval focuses in most cases on one single
+  absorber. Also,  since the calculation of the AMF depends on the absorber, we choose to process AMF and VCD only for one slant column  present in each output file. Note that easily multiple output
+  files can be generated which differ in the absorber that is chosen.  
+
+  
+.. include::
+   mapping.rst
 
 
    
