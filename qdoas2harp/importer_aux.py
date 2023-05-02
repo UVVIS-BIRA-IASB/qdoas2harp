@@ -1,4 +1,3 @@
-import IPython
 import harp 
 import netCDF4 as nc
 import numpy as np
@@ -9,8 +8,7 @@ import argparse
 from . import nctools as nct
 
 
-MOLEC_L2={'HCHO':'L2__HCHO__','SO2':'L2__SO2___'}
-
+MOLEC_L2={'HCHO':'L2__HCHO__','SO2':'L2__SO2___'} #mapping use to identify L2 auxiliary file. 
 
 def cml():
     '''entry_point used as a cml argument printing the correspoding cloud file from the L1 file that was used''' 

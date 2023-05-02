@@ -7,5 +7,21 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 write_to = "qdoas2harp/_version.py"
 
-# [project]
-# dependencies = ["template_cobra"]
+
+[project]
+name = "qdoas2harp" 
+requires-python = ">=3.7"
+dynamic = ["version"]
+dependencies = [
+				 "numpy",
+				 "netCDF4",
+				 "datetime",
+				 "attrs",
+				 "cattrs"
+				  ]
+
+
+[project.scripts]
+qd2hp = "qdoas2harp.convert2harp:cml"
+aux_imp = "qdoas2harp.importer_aux:cml"
+

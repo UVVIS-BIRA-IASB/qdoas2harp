@@ -1,12 +1,8 @@
-#!/usr/bin/env python
 import numpy as np
 import netCDF4 as nc
-import IPython
 import os, re
-import argparse
 import glob
 import datetime as dt
-import untangle
 from cattrs import structure, unstructure
 from cattrs.preconf.json import make_converter
 from attrs import define, frozen, Attribute, field
@@ -14,7 +10,7 @@ from attr import define,  Factory
 import json
 
 
-mapping_file="qd2hp_mapping.json" #contains a mapping of default qdoas names, like geolocation, time. 
+mapping_file=os.path.join(os.path.dirname(__file__),"qd2hp_mapping.json") #contains a mapping of default qdoas names, like geolocation, time. 
 molecule_fullname={'HCHO': 'formaldehyde',
                    'SO2': 'sulfur dioxide',
                    'BrO': 'Bromine oxide',
@@ -47,7 +43,7 @@ def qd2hp_mapping(qd_vars,slcol_dict):
 @define(repr=False)
 class qd2hp_entry:
     harpname=field() 
-    units: str = field(kw_only=True,default=None)
+    units: str = field(kw_only=True) #required attribute. 
     description: str = field(kw_only=True,default=None)
     comment: str = field(kw_only=True,default=None)
     valid_min: float = field(kw_only=True,default=None)
@@ -69,9 +65,6 @@ class qd2hp_entry:
         units= "molecules/cm2"
         description="uncertainty slant column {}".format(molecule_fullname[molecule])
         return cls(harpname=harpname,units=units,description=description)
-
-
-
 
 
 def readconfig(jsonfile):

@@ -2,10 +2,8 @@ from setuptools import setup
 from pkg_resources import get_distribution, DistributionNotFound
 
 try:
-    __version__ = get_distribution("template_cobra").version
-    # print(__version__)
+    __version__ = get_distribution("qdoas2harp").version
 except DistributionNotFound:
-     # package is not installed
     pass
 
 if __name__ == "__main__":

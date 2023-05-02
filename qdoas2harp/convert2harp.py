@@ -1,22 +1,15 @@
-#!/space/hpc-apps/bira/19i/py36/bin/python3
-import harp #module load 19g/py37
-import harp._harppy as harppy
+import harp
 import numpy as np
 import netCDF4
 import datetime as dt
 import glob
 import os,sys
-import subprocess
 import re
 from datetime import date
 import time
 import argparse
 from . import nctools as nct
 from .qd2hp_mapping import qd2hp_mapping
-import IPython
-#calib group is excluded. 
-
-# qd_dim={'scanlines':'n_alongtrack','rows':'n_crosstrack'}
 
 
 
@@ -35,19 +28,15 @@ def cml():
     parser.add_argument('-qdoas_inp',dest='qdoasfile',help="qdoas file to be converted to harp compliant file")
     parser.add_argument('-outdir',dest='outdir',help="harp compliant qdoas output files per fitting window")
     parser.add_argument('-slcol', nargs=1)
-    # IPython.embed();exit()
     args=parser.parse_args()
     qdoasfile=args.qdoasfile
     outdir=args.outdir
     slcol=args.slcol
-    # IPython.embed();exit()
     slcol_dict={}
     for x in slcol:
         assert re.search("\s*(\S*)\s*=\s*(\S*)\s*",slcol[0])!=None, "check input of -slcol option"
         slcol_dict[re.search("\s*(\S*)\s*=\s*(\S*)\s*",x).group(1)]=re.search("\s*(\S*)\s*=\s*(\S*)\s*",x).group(2)
     assert os.path.isdir(outdir)
-    # IPython.embed();exit()
-
     if os.path.isdir(qdoasfile):
         #process all files in the given directory
         for fileqd in glob.glob(qdoasfile+"/*"):
@@ -61,7 +50,6 @@ def cml():
 
 def makeharp(qdfile,outdir,slcol_dict):
     groups=[ x for x in  list(set(nct.listallgroups(qdfile))) ]
-    # group name Calib is fixed in qdoas, see engine/output_netcdf.cpp:31:const static string calib_subgroup_name = "Calib";
     maingroups=[x.split('/')[1] for x in groups]
     maingroup=maingroups[0]
     assert np.all([maingroup==x.split('/')[1] for x in groups])
@@ -76,18 +64,12 @@ def makeharp(qdfile,outdir,slcol_dict):
             maingr="/"+maingroup+"/"
             mainvars=[maingr+x for x in  ncqdoas[maingr].variables.keys()]
             fitvars=[fitgr+x for x in  ncqdoas[fitgr].variables.keys()]
-            # time=ncharp.createDimension("time",time_scans)
-            # ncharp.Conventions='HARP-1.0'
-            
-           
             dd=qd2hp_mapping(mainvars+fitvars,slcol_dict)
-            
-
             create_ncharpvar(dd,ncqdoas,harpout)
-            # IPython.embed();exit()
             export_metadata(ncqdoas,maingr, harpout)
 
-            
+
+        
 def export_metadata(ncqdoas,maingr,harpout):
     #export some main attributes that cannot be added with a harp export command. 
     with nct.Dataset(harpout,'a') as ncharp:
@@ -112,7 +94,6 @@ def create_ncharpvar(dd,ncqdoas,output_filename):
             hpvar=harp.Variable(nanvar,dimensions, unit=hpobj.units, valid_min=hpobj.valid_min, valid_max=hpobj.valid_max, description=hpobj.description , enum=None)
         else: #non floating point, integer point:
             if ncqdoas[qdvar].dimensions==('n_alongtrack','n_crosstrack'):
-                # continue
                 datatype=ncqdoas[qdvar].dtype.char
                 if ncqdoas[qdvar].dtype.char=='H':
                     datatype='h'
@@ -137,8 +118,6 @@ def create_ncharpvar(dd,ncqdoas,output_filename):
                     assert reftimestr!=None, "check reference time format"
                     reftime=dt.datetime.strptime(reftimestr,"%Y-%m-%d")
                     arr[j]=(dt.datetime(*bb)-reftime).total_seconds()
-                    # IPython.embed();exit()
-
                     assert arr[j]>0, "reference time too late"
                 arr=arr.astype('d',casting='same_kind')
                 hpvar=harp.Variable(arr,['time'], unit=hpobj.units, valid_min=hpobj.valid_min, valid_max=hpobj.valid_max, description=hpobj.description, enum=None)
@@ -146,11 +125,8 @@ def create_ncharpvar(dd,ncqdoas,output_filename):
                 assert 0, "unknown variable for this  conversion"
             
         obj=setattr(product,dd[qdvar].harpname,hpvar) #add harp variables as attribute to harp product.
-    # IPython.embed();exit()
-    print(")))))))))))")
     harp.export_product(product,output_filename , file_format='hdf5', hdf5_compression=6)
-        # IPython.embed();exit()
-    
+        
     
             
      

@@ -1,0 +1,79 @@
+{
+
+    "Date & time (YYYYMMDDhhmmss)": {
+        "harpname": "datetime_start",
+        "units": "seconds since 2010-01-01",
+        "descrp": "start time of the measurement",
+        "comment": null
+    },
+	"Pixel corner latitudes": {
+        "harpname": "latitude_bounds",
+        "units": "degree_north",
+        "descrp": "latitudes of the ground pixel corners (WGS84)",
+		"valid_min":-90.0,
+		"valid_max":90.0,
+        "comment": null
+    },
+	"Pixel corner longitudes": {
+        "harpname": "longitude_bounds",
+        "units": "degree_east",
+        "descrp": "longitudes of the ground pixel corners (WGS84)",
+		"valid_min":-180.0,
+		"valid_max":180.0,
+        "comment": null
+    },
+	"SZA": {
+        "harpname": "solar_zenith_angle",
+        "units": "degree",
+        "descrp": "zenith angle of the Sun at the ground pixel location (WGS84); angle measured away from the vertical",
+		"valid_min":0.0,
+		"valid_max":180.0,
+        "comment": null
+    },
+	"Solar Azimuth Angle": {
+        "harpname": "solar_azimuth_angle",
+        "units": "degree",
+        "descrp": "azimuth angle of the Sun at the ground pixel location (WGS84); angle measured East-of-North",
+		"valid_min":-180.0,
+		"valid_max":180.0,
+        "comment": null
+    },
+	"LoS Azimuth": {
+        "harpname": "sensor_azimuth_angle",
+        "units": "degree",
+        "descrp": "azimuth angle of the satellite at the ground pixel location (WGS84); angle measured East-of-North",
+		"valid_min":-180.0,
+		"valid_max":180.0,
+        "comment": null
+    },
+	"LoS ZA": {
+        "harpname": "sensor_zenith_angle",
+        "units": "degree",
+        "descrp": "zenith angle of the satellite at the ground pixel location (WGS84); angle measured away from the vertical",
+		"valid_min":0.0,
+		"valid_max":180.0,
+        "comment": null
+    },
+	"Latitude": {
+        "harpname": "latitude",
+        "units": "degree_north",
+        "descrp": "latitude of the ground pixel center (WGS84)",
+		"valid_min":-90.0,
+		"valid_max":90.0,
+        "comment": null
+    },
+	"Longitude": {
+        "harpname": "longitude",
+        "units": "degree_east",
+        "descrp": "longitude of the ground pixel center (WGS84)",
+		"valid_min":-180.0,
+		"valid_max":180.0,
+        "comment": null
+    }
+}
+
+
+
+
+
+
