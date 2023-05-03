@@ -1,6 +1,6 @@
 import harp
 import numpy as np
-import netCDF4
+import netCDF4 as nc
 import datetime as dt
 import glob
 import os,sys
@@ -8,13 +8,12 @@ import re
 from datetime import date
 import time
 import argparse
-from . import nctools as nct
+from . import nctools 
 from .qd2hp_mapping import qd2hp_mapping
 
 
 
-
-class Dataset(netCDF4.Dataset): #https://github.com/Unidata/netcdf4-python/issues/785
+class Dataset(nc.Dataset): #https://github.com/Unidata/netcdf4-python/issues/785
         def __init__(self, *args, **kwargs):
             super(Dataset, self).__init__(*args, **kwargs)
             self.set_auto_mask(True)
@@ -25,9 +24,9 @@ def cml():
     helpstr='qdoas output file' 
     parser = argparse.ArgumentParser(description='give L1 file')
     # parser.add_argument('-file', dest='file', action='store', required=True,help=helpstr, default=None)
-    parser.add_argument('-qdoas_inp',dest='qdoasfile',help="qdoas file to be converted to harp compliant file")
-    parser.add_argument('-outdir',dest='outdir',help="harp compliant qdoas output files per fitting window")
-    parser.add_argument('-slcol', nargs=1)
+    parser.add_argument( dest='qdoasfile',help="qdoas file to be converted to harp compliant file")
+    parser.add_argument('-outdir',dest='outdir',help="harp compliant qdoas output files per fitting window",required=True)
+    parser.add_argument('-slcol', nargs=1,required=True)
     args=parser.parse_args()
     qdoasfile=args.qdoasfile
     outdir=args.outdir
@@ -49,7 +48,7 @@ def cml():
     
 
 def makeharp(qdfile,outdir,slcol_dict):
-    groups=[ x for x in  list(set(nct.listallgroups(qdfile))) ]
+    groups=[ x for x in  list(set(nctools.listallgroups(qdfile))) ]
     maingroups=[x.split('/')[1] for x in groups]
     maingroup=maingroups[0]
     assert np.all([maingroup==x.split('/')[1] for x in groups])
@@ -58,7 +57,7 @@ def makeharp(qdfile,outdir,slcol_dict):
     assert np.all([maingroup==x.split('/')[1] for x in groups])
     assert np.all(['Calib'==x for x in calibgroups]) or len(calibgroups==0)
     for fitwin in subgroups:
-        harpout=outdir+re.sub(r'.*/([^.]+)(.*)',r'\1_{}\2'.format(fitwin),qdfile)
+        harpout=outdir+re.sub(r'.*/([^.]+)(.*)',r'/\1_{}\2'.format(fitwin),qdfile)
         with Dataset(qdfile,'r') as ncqdoas:
             fitgr="/"+maingroup+"/"+fitwin+"/"
             maingr="/"+maingroup+"/"
@@ -72,7 +71,7 @@ def makeharp(qdfile,outdir,slcol_dict):
         
 def export_metadata(ncqdoas,maingr,harpout):
     #export some main attributes that cannot be added with a harp export command. 
-    with nct.Dataset(harpout,'a') as ncharp:
+    with nc.Dataset(harpout,'a') as ncharp:
         ncharp.L1_InputFile=ncqdoas[maingr].InputFile.split('/')[-1]
 
 
@@ -87,10 +86,10 @@ def create_ncharpvar(dd,ncqdoas,output_filename):
         if ncqdoas[qdvar].dtype.char in ['f','d']:#needs conversion of fillvalues to nan
             if ncqdoas[qdvar].dimensions==('n_alongtrack', 'n_crosstrack'):
                 dimensions=["time"]
-                nanvar=nct.makemasked(ncqdoas[qdvar][:].flatten()).astype('f',casting='same_kind')
+                nanvar=nctools.makemasked(ncqdoas[qdvar][:].flatten()).astype('f',casting='same_kind')
             elif ncqdoas[qdvar].dimensions==('n_alongtrack', 'n_crosstrack','4'):
                 dimensions=["time",None]
-                nanvar=nct.makemasked(ncqdoas[qdvar][:].reshape(-1,4)).astype('f',casting='same_kind')
+                nanvar=nctools.makemasked(ncqdoas[qdvar][:].reshape(-1,4)).astype('f',casting='same_kind')
             hpvar=harp.Variable(nanvar,dimensions, unit=hpobj.units, valid_min=hpobj.valid_min, valid_max=hpobj.valid_max, description=hpobj.description , enum=None)
         else: #non floating point, integer point:
             if ncqdoas[qdvar].dimensions==('n_alongtrack','n_crosstrack'):
@@ -102,7 +101,7 @@ def create_ncharpvar(dd,ncqdoas,output_filename):
 
             elif hpobj.harpname=="datetime_start": #exception for times. 
                 assert ncqdoas[qdvar].dimensions==('n_alongtrack', 'n_crosstrack','datetime')
-                tt=nct.makemasked(ncqdoas[qdvar][:])
+                tt=nctools.makemasked(ncqdoas[qdvar][:])
                 #bug in qdoas that some times are fillvalues for some rows>0, temporary solution is to take the times from rows=0, since times for all rows is the same. 
                 idxnan=np.nonzero(np.isnan(tt))
                 if idxnan:

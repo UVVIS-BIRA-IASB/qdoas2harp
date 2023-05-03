@@ -8,8 +8,8 @@
 
 project = 'qdoas2harp'
 copyright = '2023'
-author = 'bira'
-release = '000'
+author = 'bira-iasb'
+release = '100'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

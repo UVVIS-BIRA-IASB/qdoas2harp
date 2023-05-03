@@ -7,14 +7,13 @@ import re
 import argparse
 from . import nctools as nct
 
-
 MOLEC_L2={'HCHO':'L2__HCHO__','SO2':'L2__SO2___'} #mapping use to identify L2 auxiliary file. 
 
 def cml():
     '''entry_point used as a cml argument printing the correspoding cloud file from the L1 file that was used''' 
     helpstr='print which aux. data can be added together with the corresponding file'
     parser = argparse.ArgumentParser(description='provide harp compliant qdoas output file')
-    parser.add_argument(dest='l2file',help="adding cloud parameters")
+    parser.add_argument(dest='l2file',help="qdoas harp compliant file")
     parser.add_argument('--auxdir',dest='auxdir',help="dir where aux. file is in",default=None)
     args=parser.parse_args()
     l2file=args.l2file 
@@ -22,7 +21,8 @@ def cml():
     if os.path.isdir(l2file):
         for l2f in glob.glob(l2file+"/*"):
             if auxdir==None:
-                 print("{} ----> {}".format(l2f,give_auxfilename(l2f,molec)))
+                # IPython.embed();exit()
+                print("{} ----> {}".format(l2f,give_auxfilename(l2f)))
             else:
                 assert len(glob.glob(auxdir+"/"+give_auxfilename(l2f)))==1
                 auxfile=glob.glob(auxdir+"/"+give_auxfilename(l2f))[0]
@@ -42,14 +42,14 @@ def give_auxfilename(l2file):
     molec_l2={}
     with nc.Dataset(l2file,'r') as ncfile:
         l1used=ncfile.L1_InputFile
-        slcol=[x for x in ncfile.variables.keys() if 'column' in x]
+        slcol=[x for x in ncfile.variables.keys() if re.search("\w*slant\w*density$",x)]
     patt=re.search(r"S5P_(?P<proc>[A-Z]{4})_L1B_RA_BD\d_(?P<start>\d{8}T\d{6})_(?P<end>\d{8}T\d{6})_(?P<orbit>\d{5})_(?P<num>\d{2}).*",l1used)
     molec=[]
     for x in MOLEC_L2.keys():
         if all([x in y for y in slcol]):
             molec.append(x)
         else:
-            assert all([x in y for y in slcol])==False, "multiple slant columns in product"
+            assert len([x in y for y in slcol])==1, "not a single slant column in product"
     assert len(molec)==1, "absorber molecule not found"
     molecule=molec[0]
     proc=patt.group('proc')
