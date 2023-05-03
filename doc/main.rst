@@ -8,7 +8,7 @@ A qdoas file consist typically out of a main group with variables such as geoloc
 
 Below in picture :numref:`qdoasview`  a typical qdoas layout is shown. 
 
-..  figure:: ../figs/fig1.png
+..  figure:: figs/fig1.png
    :name: qdoasview
    :scale: 50 %
    :alt: hdfview of typical qdoas layout
