@@ -10,7 +10,7 @@ import time
 import argparse
 from . import nctools 
 from .qd2hp_mapping import qd2hp_mapping
-
+from attrs import define, frozen, Attribute, field
 
 
 class Dataset(nc.Dataset): #https://github.com/Unidata/netcdf4-python/issues/785
@@ -40,14 +40,44 @@ def cml():
         #process all files in the given directory
         for fileqd in glob.glob(qdoasfile+"/*"):
             assert fileqd[-2:]=="nc"
-            makeharp(fileqd,outdir,slcol_dict)
+            qdoas1=makeharp(fileqd,slcol_dict)
+            qdoas1.print_product(outdir)
     else:
         assert qdoasfile[-2:]=="nc"
-        makeharp(qdoasfile,outdir,slcol_dict)
+        qdoas1=makeharp(qdoasfile,slcol_dict)
+        qdoas1.print_product(outdir)
+   
 
+@define(repr=False,slots=False)
+class qdoas_fitwin:
+    #add dynamical harp product as attribute for fitwin variables
+    # win_name: float=field()
+    win_down:float=field()
+    win_up: float=field()
+    product: field()
     
 
-def makeharp(qdfile,outdir,slcol_dict):
+
+@define(repr=False,slots=False)
+class qdoas_harp:
+    #add dynamical harp product as attribute  for main variables. 
+    qdoasfile:str =field()
+    l1file:str=field(default=None)
+    product=field(default=None)
+    
+    def print_product(self,outdir):
+        for k in self.__dict__.keys():
+            if type(self.__dict__[k]).__name__=='qdoas_fitwin':
+                harpout=outdir+re.sub(r'.*/([^.]+)(.*)',r'/\1_{}\2'.format(k),self.qdoasfile)
+                output_product=harp.Product()
+                for x in  self.product:
+                    setattr(output_product,x,self.product[x])
+                for x in getattr(self,k).product:
+                    setattr(output_product,x,getattr(self,k).product[x])
+                harp.export_product(output_product,harpout , file_format='hdf5', hdf5_compression=6)
+
+        
+def makeharp(qdfile,slcol_dict):
     groups=[ x for x in  list(set(nctools.listallgroups(qdfile))) ]
     maingroups=[x.split('/')[1] for x in groups]
     maingroup=maingroups[0]
@@ -56,28 +86,30 @@ def makeharp(qdfile,outdir,slcol_dict):
     calibgroups=[x.split('/')[3] for x in groups  if x.count('/')==3]
     assert np.all([maingroup==x.split('/')[1] for x in groups])
     assert np.all(['Calib'==x for x in calibgroups]) or len(calibgroups==0)
-    for fitwin in subgroups:
-        harpout=outdir+re.sub(r'.*/([^.]+)(.*)',r'/\1_{}\2'.format(fitwin),qdfile)
-        with Dataset(qdfile,'r') as ncqdoas:
-            fitgr="/"+maingroup+"/"+fitwin+"/"
-            maingr="/"+maingroup+"/"
-            mainvars=[maingr+x for x in  ncqdoas[maingr].variables.keys()]
-            fitvars=[fitgr+x for x in  ncqdoas[fitgr].variables.keys()]
-            dd=qd2hp_mapping(mainvars+fitvars,slcol_dict)
-            create_ncharpvar(dd,ncqdoas,harpout)
-            export_metadata(ncqdoas,maingr, harpout)
+    
+    with Dataset(qdfile,'r') as ncqdoas:
+        maingr="/"+maingroup+"/"
+        mainvars_in_qdoas=[maingr+x for x in  ncqdoas[maingr].variables.keys()]
+        main_vars_mapping=qd2hp_mapping(mainvars_in_qdoas,slcol_dict)
+        qdoas1=qdoas_harp(qdfile,ncqdoas[maingr].InputFile.split('/')[-1],create_harp_product(main_vars_mapping,ncqdoas))
+        for fitwin in subgroups:
+            fitgr=maingr+fitwin+"/"
+            fit_vars=[fitgr+x for x in  ncqdoas[fitgr].variables.keys()]
+            fit_vars_mapping=qd2hp_mapping(fit_vars,slcol_dict)
+            qdoas_fitwin1=qdoas_fitwin(0.0,0.0,create_harp_product(fit_vars_mapping,ncqdoas))
+            setattr(qdoas1,fitwin,qdoas_fitwin1) # set attribute field with harp product.
+    return qdoas1
 
-
-        
-def export_metadata(ncqdoas,maingr,harpout):
+    
+def get_metadata(ncqdoas,maingr):
     #export some main attributes that cannot be added with a harp export command. 
     with nc.Dataset(harpout,'a') as ncharp:
-        ncharp.L1_InputFile=ncqdoas[maingr].InputFile.split('/')[-1]
-
+        L1_InputFile=ncqdoas[maingr].InputFile.split('/')[-1]
+    return L1_InputFile
 
     
         
-def create_ncharpvar(dd,ncqdoas,output_filename):
+def create_harp_product(dd,ncqdoas):
     product = harp.Product()
     for qdvar in dd.keys():
         hpobj=dd[qdvar]
@@ -123,8 +155,8 @@ def create_ncharpvar(dd,ncqdoas,output_filename):
             else:
                 assert 0, "unknown variable for this  conversion"
             
-        obj=setattr(product,dd[qdvar].harpname,hpvar) #add harp variables as attribute to harp product.
-    harp.export_product(product,output_filename , file_format='hdf5', hdf5_compression=6)
+        setattr(product,dd[qdvar].harpname,hpvar) #add harp variables as attribute to harp product.
+    return product
         
     
             
