@@ -9,7 +9,6 @@ from attrs import define, frozen, Attribute, field
 from attr import define,  Factory
 import json
 
-
 mapping_file=os.path.join(os.path.dirname(__file__),"qd2hp_mapping.json") #contains a mapping of default qdoas names, like geolocation, time. 
 molecule_fullname={'HCHO': 'formaldehyde',
                    'SO2': 'sulfur dioxide',
