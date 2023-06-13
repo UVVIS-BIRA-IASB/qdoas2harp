@@ -11,7 +11,7 @@ import argparse
 from . import nctools 
 from .qd2hp_mapping import qd2hp_mapping
 from attrs import define, frozen, Attribute, field
-
+import coda
 
 class Dataset(nc.Dataset): #https://github.com/Unidata/netcdf4-python/issues/785
         def __init__(self, *args, **kwargs):
@@ -27,23 +27,25 @@ def cml():
     parser.add_argument('-outdir',dest='outdir',help="harp compliant qdoas output files per fitting window",required=True)
     parser.add_argument('-slcol', nargs=1,required=True)
     parser.add_argument('-fitwin',nargs=1,type=str,required=True)
+    parser.add_argument('-pixcor',type=str)
 
     args=parser.parse_args()
     qdoasfile=args.qdoasfile
     outdir=args.outdir
     slcol=args.slcol[0]
     fitwindow=args.fitwin[0]
+    pixcorfile=args.pixcor
    
     assert os.path.isdir(outdir)
     if os.path.isdir(qdoasfile):
         #process all files in the given directory
         for fileqd in glob.glob(qdoasfile+"/*"):
             assert fileqd[-2:]=="nc"
-            qdoas_obj=qdoas_harp.create_qd2hp(qdoasfile,slcol,fitwindow)
+            qdoas_obj=qdoas_harp.create_qd2hp(qdoasfile,slcol,fitwindow,pixcorfile=pixcorfile)
             qdoas_obj.print_product(outdir)
     else:
         assert qdoasfile[-2:]=="nc"
-        qdoas_obj=qdoas_harp.create_qd2hp(qdoasfile,slcol,fitwindow)
+        qdoas_obj=qdoas_harp.create_qd2hp(qdoasfile,slcol,fitwindow,pixcorfile=pixcorfile)
         qdoas_obj.print_product(outdir)
 
    
@@ -57,9 +59,12 @@ class qdoas_harp:
     fitwin_range: list=field(factory=list)
     l1file:str=field(default=None)
     sensor:str=field(default=None)
+    # pixcor:str=field(default=None)
+    band:str=field(default=None)
+
         
     @classmethod
-    def create_qd2hp(cls,qdoasfile,slcol,fitwin):
+    def create_qd2hp(cls,qdoasfile,slcol,fitwin,pixcorfile=None):
         
         with Dataset(qdoasfile,'r') as ncqdoas:
             #read groups from qdoas file and retrieve the desired group. 
@@ -80,9 +85,16 @@ class qdoas_harp:
             fitwin_range=ncqdoas[fitgroup].getncattr('fitting window range')
             sensor=ncqdoas[maingroup].Sensor
             l1file=ncqdoas[maingroup].InputFile.split('/')[-1]
+            band=ncqdoas[maingroup].getncattr("L1 spectral_band")
             variables_mapping=qd2hp_mapping(main_variables+fit_variables,slcol_dict)
-            if(sensor=='OMI' or sensor=='TROPOMI'):
+            variables_mapping_pixcor=qd2hp_mapping(["Pixel corner latitudes","Pixel corner longitudes"])
+            if(sensor=='OMI'):
                 product=create_harp_product_omi_tropomi(variables_mapping,ncqdoas)
+                assert check_pixcor(l1file,pixcorfile), "{} is not the right corresponding pixcor file is given".format(pixcorfile)
+                add_pixcor(product,variables_mapping_pixcor,pixcorfile,band)
+            elif(sensor=='TROPOMI'):
+                product=create_harp_product_omi_tropomi(variables_mapping,ncqdoas)
+               
             elif(sensor=='GOME-2'):
                 product=create_harp_product_gome2(variables_mapping,ncqdoas)
             else:
@@ -91,8 +103,10 @@ class qdoas_harp:
         fitup=float(re.search("(\d*\.\d*)\s*\:\s*([\d\.]*)",fitwin_range).group(1))
         fitdown=float(re.search("(\d*\.\d*)\s*\:\s*([\d\.]*)",fitwin_range).group(2))
         
-        return qdoas_harp(qdoasfile,product,fitwin ,list([fitup,fitdown]),l1file,sensor)
+        return qdoas_harp(qdoasfile,product,fitwin ,list([fitup,fitdown]),l1file,sensor,band)
 
+
+    
     def print_product(self,outdir):
         #create an output filename and export with Harp to a netcdf4 file.
         outputfile=outdir+"/"+re.sub(r'.*/([^.]+)(.*)',r'/\1_{}\2'.format(self.fitwin_name),self.filename_qdoas)
@@ -102,8 +116,41 @@ class qdoas_harp:
             ncharp.fitting_window_range=self.fitwin_range
             ncharp.L1_file=self.l1file
             ncharp.sensor=self.sensor
-            
+            ncharp.L1_spectral_band=self.band
 
+
+def check_pixcor(l1file,pfile):
+    #based on the L1 filename, check if the right pixcor file is provided. there can be an issue with pixcor file with diff. mod. times. 
+    check_str=re.search("OMI-Aura_L1-\S{8}_(\d{4}m\d{4}t\d{4}-o\d{5})*",l1file).group(1)
+    pfile_found=os.path.dirname(pfile)+"/OMI-Aura_L2-OMPIXCOR_"+check_str+"*"
+    if glob.glob(pfile_found)[0]==pfile:
+        return True
+    else:
+        return False
+    
+    
+def add_pixcor(product,mapping,pixcorfile,band):
+    #adding lat/long bounds by taking those from the omi pixcor files. 
+    hpobj=mapping["Pixel corner latitudes"]
+    pixcor=coda.Product(pixcorfile)
+    cursor=pixcor.cursor()
+    cursor.goto("/HDFEOS/SWATHS/OMI_Ground_Pixel_Corners_{}/Data_Fields/TiledCornerLatitude".format(band))
+    data_lat=cursor.fetch()
+    hpvar=harp.Variable(data_lat.reshape(4,-1).swapaxes(0,1),['time',None], unit=hpobj.units, valid_min=hpobj.valid_min, valid_max=hpobj.valid_max, description=hpobj.description, enum=None)
+    setattr(product,hpobj.harpname,hpvar)
+
+    
+    hpobj=mapping["Pixel corner longitudes"]
+    pixcor=coda.Product(pixcorfile)
+    cursor=pixcor.cursor()
+    cursor.goto("/HDFEOS/SWATHS/OMI_Ground_Pixel_Corners_{}/Data_Fields/TiledCornerLongitude".format(band))
+    data_long=cursor.fetch()
+    hpvar=harp.Variable(data_long.reshape(4,-1).swapaxes(0,1),['time',None], unit=hpobj.units, valid_min=hpobj.valid_min, valid_max=hpobj.valid_max, description=hpobj.description, enum=None)
+    setattr(product,hpobj.harpname,hpvar)
+    return product
+    
+
+            
 def create_harp_product_gome2(mapping,ncqdoas):
     #no n_crosstrack dimension for gome2
     product = harp.Product()
@@ -140,6 +187,7 @@ def create_harp_product_gome2(mapping,ncqdoas):
                 assert 0, "unknown variable for this  conversion"
             
         setattr(product,mapping[qdvar].harpname,hpvar) #add harp variables as attribute to harp product.
+    
     return product
 
            
@@ -189,6 +237,7 @@ def create_harp_product_omi_tropomi(mapping,ncqdoas):
     
 def qdoas_time_harp(time,reftime):
     '''this function converts qdoas times to seconds since a reference time'''
+    #ref. time 
     arr=np.full((time.shape[0]),np.nan,dtype='d').flatten()
 
     for j in range(0,time.shape[0]):

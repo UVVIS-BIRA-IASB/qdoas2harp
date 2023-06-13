@@ -9,7 +9,7 @@ variables.
 
 
 
-.. list-table::
+.. list-table:: Mapping of variable names between qdoas and harp names. 
    :header-rows: 1
 
    - 

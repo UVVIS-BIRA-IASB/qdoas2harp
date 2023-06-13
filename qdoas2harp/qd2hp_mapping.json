@@ -2,7 +2,7 @@
 
     "Date & time (YYYYMMDDhhmmss)": {
         "harpname": "datetime_start",
-        "units": "seconds since 2010-01-01",
+        "units": "seconds since 2000-01-01",
         "descrp": "start time of the measurement",
         "comment": null
     },

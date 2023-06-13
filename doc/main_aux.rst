@@ -1,3 +1,4 @@
+.. _ref2:
 Adding auxiliary information.
 =============================
 

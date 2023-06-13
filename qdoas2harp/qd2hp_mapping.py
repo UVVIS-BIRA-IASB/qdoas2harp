@@ -17,10 +17,10 @@ molecule_fullname={'HCHO': 'formaldehyde',
                    'C2H2O2': 'glyoxal'} 
 
 
-def qd2hp_mapping(qd_vars,slcol_dict):
+def qd2hp_mapping(qd_vars,slcol_dict=None):
     '''qd_vars  contains variables names used in qdoas without the groups prepended.'''
     qd2hp_dict={}
-    assert np.all([slcol_dict[x] in molecule_fullname.keys() for x in slcol_dict.keys()]),"wrong molecule name"
+    assert slcol_dict==None  or np.all([slcol_dict[x] in molecule_fullname.keys() for x in slcol_dict.keys()]),"wrong molecule name"
     mapping=readconfig(mapping_file)
     for qdvar_path in qd_vars:
         qdvar=qdvar_path.split('/')[-1]

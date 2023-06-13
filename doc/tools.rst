@@ -1,3 +1,4 @@
+.. _ref_cml:
 Command line tools
 ==================
 

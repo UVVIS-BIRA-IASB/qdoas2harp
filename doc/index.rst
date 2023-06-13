@@ -14,6 +14,7 @@ qdoas2harp documentation!
    main.rst
    main_aux.rst
    tools.rst
+   qd2hp_py.rst
    limit.rst
    
    
