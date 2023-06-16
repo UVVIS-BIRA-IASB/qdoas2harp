@@ -26,6 +26,8 @@ To use qdoas2harp, first install it using pip, for example in a virt. env. calle
 
    (.venv) $ git clone https://github.com/UVVIS-BIRA-IASB/qdoas2harp
    (.venv) $ cd qdoas2harp
-   (.venv) $ pip install . 
+   (.venv) $ pip install .
+
+Note that a recent version of pip (for example 23.1.2) may be needed. 
 
 A recent qdoas version (>= 3.5.1)  is needed. Currently qdoas 3.5.1 is not yet released, but a qdoas version from commit number d1c582178... on github should work. (https://github.com/UVVIS-BIRA-IASB/qdoas) 

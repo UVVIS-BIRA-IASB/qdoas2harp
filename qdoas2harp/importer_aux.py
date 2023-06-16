@@ -41,7 +41,7 @@ def give_auxfilename(l2file):
     #molecule is derived from the slant column present in qdoas. 
     molec_l2={}
     with nc.Dataset(l2file,'r') as ncfile:
-        l1used=ncfile.L1_InputFile
+        l1used=ncfile.L1_file
         slcol=[x for x in ncfile.variables.keys() if re.search("\w*slant\w*density$",x)]
     patt=re.search(r"S5P_(?P<proc>[A-Z]{4})_L1B_RA_BD\d_(?P<start>\d{8}T\d{6})_(?P<end>\d{8}T\d{6})_(?P<orbit>\d{5})_(?P<num>\d{2}).*",l1used)
     molec=[]

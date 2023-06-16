@@ -53,10 +53,16 @@ In :numref:`harpomiview` an example is given of an qdoas outputfile after conver
    hdfview of a converted qdoas ouput file from OMI. 
 
 Based on the main attributes: *sensor, L1_file, L1_spectral_band* the corresponding L2 OMPIXCOR can be found, from which **latitude_bounds** and **longitude_bounds** can be constructed. Note that the
-filepath to the corresponding OMPIXCOR file needs to be provided. (see :ref:`ref_cml`)   
+filepath to the corresponding OMPIXCOR file needs to be provided. (see :ref:`ref_cml`)
+
+
 Mapping for GOME2A,B and C:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 For the latitude, longitude bounds: the corners ABCD are reordered as BDCA.
+
 
 Mapping for Tropomi
 ^^^^^^^^^^^^^^^^^^^^
+
+

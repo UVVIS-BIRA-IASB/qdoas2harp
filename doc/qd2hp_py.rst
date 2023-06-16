@@ -6,8 +6,8 @@ Python interface
 
 .. code-block:: python
 
-   import numpy as np
-   print("Hello World")
+   import qdoas2harp.convert2harp as qd2hp
+   print("Work in progress")
 
 				
 				
