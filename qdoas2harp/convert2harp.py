@@ -12,6 +12,8 @@ from . import nctools
 from .qd2hp_mapping import qd2hp_mapping
 from attrs import define, frozen, Attribute, field
 import coda
+from json import dumps
+import IPython
 
 class Dataset(nc.Dataset): #https://github.com/Unidata/netcdf4-python/issues/785
         def __init__(self, *args, **kwargs):
@@ -59,9 +61,10 @@ class qdoas_harp:
     fitwin_range: list=field(factory=list)
     l1file:str=field(default=None)
     sensor:str=field(default=None)
+   
     # pixcor:str=field(default=None)
     band:str=field(default=None)
-
+    qdoas_version:str=field(default=None)
         
     @classmethod
     def create_qd2hp(cls,qdoasfile,slcol,fitwin,pixcorfile=None):
@@ -84,6 +87,7 @@ class qdoas_harp:
             assert 'fitting window range' in ncqdoas[fitgroup].ncattrs()
             fitwin_range=ncqdoas[fitgroup].getncattr('fitting window range')
             sensor=ncqdoas[maingroup].Sensor
+            qdoas_version=re.search(".* using Qdoas\s*\((.*)\)",ncqdoas[maingroup].Qdoas).group(1)
             l1file=ncqdoas[maingroup].InputFile.split('/')[-1]
             band=ncqdoas[maingroup].getncattr("L1 spectral_band")
             variables_mapping=qd2hp_mapping(main_variables+fit_variables,slcol_dict)
@@ -103,20 +107,27 @@ class qdoas_harp:
         fitup=float(re.search("(\d*\.\d*)\s*\:\s*([\d\.]*)",fitwin_range).group(1))
         fitdown=float(re.search("(\d*\.\d*)\s*\:\s*([\d\.]*)",fitwin_range).group(2))
         
-        return qdoas_harp(qdoasfile,product,fitwin ,list([fitup,fitdown]),l1file,sensor,band)
+        return qdoas_harp(qdoasfile,product,fitwin ,list([fitup,fitdown]),l1file,sensor,band,qdoas_version)
 
 
     
     def print_product(self,outdir):
         #create an output filename and export with Harp to a netcdf4 file.
-        outputfile=outdir+"/"+re.sub(r'.*/([^.]+)(.*)',r'/\1_{}\2'.format(self.fitwin_name),self.filename_qdoas)
+        # outputfile=outdir+"/"+re.sub(r'.*/([^.]+)(.*)',r'/\1_{}\2'.format(self.fitwin_name),self.filename_qdoas)
+        if self.sensor=='TROPOMI':
+            outputfile=outdir+"/"+re.sub(r'([^.]+)L1B_RA_BD3(.*)',r'\1QDOAS\2',self.l1file)
+        elif self.sensor=='OMI':
+            outputfile=outdir+"/"+re.sub(r'([^.]+)L1-OML1BRUG(.*)',r'\1QDOAS\2',self.l1file)
+        elif self.sensor=="GOME-2":
+            outputfile=outdir+"/"+re.sub(r'([^.]+)xxx_1B(.*)',r'\1QDOAS\2',self.l1file)
+            
+        else:
+            assert False, "sensor not known"
+
+        
+        attr_dict={"name of sensor":self.sensor,"fitwindow name":self.fitwin_name,"fitwindow range":self.fitwin_range,"L1 file":self.l1file,"L1 spectral band":self.band,"QDOAS version":self.qdoas_version}
+        self.product.history="qdoas2harp conversion. {}".format(dumps(attr_dict)) #only attribute that is usable to store information, and that is kept when using harp command line tools. 
         harp.export_product(self.product,outputfile , file_format='hdf5', hdf5_compression=6)
-        #Harp doesn't allow to add  attributes, so we add them seperately 
-        with Dataset(outputfile,'a') as ncharp:
-            ncharp.fitting_window_range=self.fitwin_range
-            ncharp.L1_file=self.l1file
-            ncharp.sensor=self.sensor
-            ncharp.L1_spectral_band=self.band
 
 
 def check_pixcor(l1file,pfile):
