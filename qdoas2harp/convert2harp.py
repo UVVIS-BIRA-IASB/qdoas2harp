@@ -125,8 +125,9 @@ class qdoas_harp:
             assert False, "sensor not known"
 
         
-        attr_dict={"name of sensor":self.sensor,"fitwindow name":self.fitwin_name,"fitwindow range":self.fitwin_range,"L1 file":self.l1file,"L1 spectral band":self.band,"QDOAS version":self.qdoas_version}
-        self.product.history="qdoas2harp conversion. {}".format(dumps(attr_dict)) #only attribute that is usable to store information, and that is kept when using harp command line tools. 
+        attr_dict={"qdoas file":os.path.basename(self.filename_qdoas),"name of sensor":self.sensor,"fitwindow name":self.fitwin_name,"fitwindow range":self.fitwin_range,"L1 file":self.l1file,"L1 spectral band":self.band,"QDOAS version":self.qdoas_version}
+        self.product.history="qdoas2harp conversion. {}".format(dumps(attr_dict).replace('"', '')) #only attribute that is usable to store information, and that is kept when using harp command line tools.
+        
         harp.export_product(self.product,outputfile , file_format='hdf5', hdf5_compression=6)
 
 
@@ -241,6 +242,10 @@ def create_harp_product_omi_tropomi(mapping,ncqdoas):
                 assert 0, "unknown variable for this  conversion"
             
         setattr(product,mapping[qdvar].harpname,hpvar) #add harp variables as attribute to harp product.
+    # IPython.embed();exit()
+    scansub=harp.Variable(np.arange(product.latitude.data.shape[0],dtype=np.int32)%n_crosstrack_size,['time'],description="pixel index (0-based) within the scanline")
+    setattr(product,"scan_subindex",scansub) #add harp variables as attribute to harp product.
+
     return product
 
 
