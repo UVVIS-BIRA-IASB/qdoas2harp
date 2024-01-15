@@ -16,10 +16,10 @@ requires-python = ">=3.7"
 dynamic = ["version"]
 dependencies = [
 				 "numpy",
-				 "netCDF4",
-				 "datetime",
-				 "attrs",
-				 "cattrs"
+				  "netCDF4",
+				  "attrs",
+				 "cattrs",
+                                  "coda"   
 				  ]
 
 
