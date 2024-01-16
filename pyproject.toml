@@ -18,8 +18,7 @@ dependencies = [
 				 "numpy",
 				  "netCDF4",
 				  "attrs",
-				 "cattrs",
-                                  "coda"   
+				 "cattrs"
 				  ]
 
 

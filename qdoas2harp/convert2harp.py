@@ -5,7 +5,6 @@ import os
 import re
 import argparse
 from json import dumps
-import coda
 import harp
 import netCDF4 as nc
 import numpy as np
@@ -18,8 +17,8 @@ def cml():
     '''entry_point used as a cml argument for input qdoas filename
     and will generate an output filename '''
     parser = argparse.ArgumentParser(description='give L1 file')
-    parser.add_argument( dest='qdoasfile',help="qdoas file to be converted to harp compliant file")
-    parser.add_argument('-outdir',dest='outdir',help=
+    parser.add_argument(dest='qdoasfile',help="qdoas file to be converted to harp compliant file")
+    parser.add_argument('-outdir', dest='outdir',help=
                         "harp compliant qdoas output files per fitting window",required=True)
     parser.add_argument('-slcol', nargs=1,required=True)
     parser.add_argument('-fitwin',nargs=1,type=str,required=True)
@@ -128,59 +127,61 @@ def check_pixcor(l1file,pfile):
         return True
     else:
         return False
-    
-def add_pixcor(product,mapping,pixcorfile,band):
+
+
+def add_pixcor(product, mapping, pixcorfile, band):
     '''adding lat/long bounds by taking those from the omi pixcor files.'''
-    hpobj=mapping["Pixel corner latitudes"]
-    pixcor=coda.Product(pixcorfile)
-    cursor=pixcor.cursor()
-    cursor.goto("/HDFEOS/SWATHS/OMI_Ground_Pixel_Corners_{}/Data_Fields/TiledCornerLatitude"
-                .format(band))
-    data_lat=cursor.fetch()
-    hpvar=harp.Variable(data_lat.reshape(4,-1).swapaxes(0,1),['time',None],
-                        unit=hpobj.units, valid_min=hpobj.valid_min, valid_max=hpobj.valid_max,
-                        description=hpobj.description, enum=None)
-    setattr(product,hpobj.harpname,hpvar)
-    hpobj=mapping["Pixel corner longitudes"]
-    pixcor=coda.Product(pixcorfile)
-    cursor=pixcor.cursor()
-    cursor.goto("/HDFEOS/SWATHS/OMI_Ground_Pixel_Corners_{}/Data_Fields/TiledCornerLongitude"
-                .format(band))
-    data_long=cursor.fetch()
-    hpvar=harp.Variable(data_long.reshape(4,-1).swapaxes(0,1),['time',None], unit=hpobj.units,
-                        valid_min=hpobj.valid_min, valid_max=hpobj.valid_max,
-                        description=hpobj.description,enum=None)
-    setattr(product,hpobj.harpname,hpvar)
+    hpobj_lat = mapping["Pixel corner latitudes"]
+    with nc.Dataset(pixcorfile, 'r') as ncpixcor:
+        data_lat = ncpixcor["/HDFEOS/SWATHS/OMI Ground Pixel Corners {}/"
+                            "Data Fields/TiledCornerLatitude".
+                            format(band.replace("_", "-"))][:]
+        data_long = ncpixcor["/HDFEOS/SWATHS/OMI Ground Pixel Corners {}/"
+                             "Data Fields/TiledCornerLongitude".
+                             format(band.replace("_", "-"))][:]
+    hpvar_lat = harp.Variable(data_lat.reshape(4, -1).swapaxes(0, 1),
+                              ['time', None], unit=hpobj_lat.units,
+                              valid_min=hpobj_lat.valid_min,
+                              valid_max=hpobj_lat.valid_max,
+                              description=hpobj_lat.description, enum=None)
+    setattr(product, hpobj_lat.harpname, hpvar_lat)
+    hpobj_long = mapping["Pixel corner longitudes"]
+    hpvar_long = harp.Variable(data_long.reshape(4, -1).swapaxes(0,1),
+                               ['time', None], unit=hpobj_long.units,
+                               valid_min=hpobj_long.valid_min,
+                               valid_max=hpobj_long.valid_max,
+                               description=hpobj_long.description,enum=None)
+    setattr(product, hpobj_long.harpname, hpvar_long)
     return product
 
 
-def create_harp_product_gome2(mapping,ncqdoas):
+def create_harp_product_gome2(mapping, ncqdoas):
     '''no n_crosstrack dimension for gome2'''
     product = harp.Product()
     for qdvar in mapping.keys():
         hpobj=mapping[qdvar]
         hpvar=harp.Variable(hpobj.harpname)
-        assert ncqdoas[qdvar].dtype.char in ['f','d','h','s','b','B','c','i','l','H','I']
-        if ncqdoas[qdvar].dtype.char in ['f','d']:#needs conversion of fillvalues to nan
-            if ncqdoas[qdvar].dimensions==('n_alongtrack',):
-                dimensions=["time"]
-                nanvar=nctools.makemasked(ncqdoas[qdvar][:]).astype('f',casting='same_kind')
-            elif ncqdoas[qdvar].dimensions==('n_alongtrack','3'):
-                dimensions=["time"]
-                nanvar=nctools.makemasked(ncqdoas[qdvar][:,1]).astype('f',casting='same_kind')
-            elif ncqdoas[qdvar].dimensions==('n_alongtrack','4'):
-                dimensions=["time",None]
-                assert hpobj.harpname=="latitude_bounds" or hpobj.harpname=="longitude_bounds"
-                nanvar=nctools.makemasked(ncqdoas[qdvar][:,[1,3,2,0]]).astype('f',
-                                                                              casting='same_kind')
+        assert ncqdoas[qdvar].dtype.char in ['f', 'd', 'h', 's', 'b', 'B', 'c', 'i', 'l', 'H', 'I']
+        if ncqdoas[qdvar].dtype.char in ['f', 'd']:#needs conversion of fillvalues to nan
+            if ncqdoas[qdvar].dimensions == ('n_alongtrack',):
+                dimensions = ["time"]
+                nanvar = nctools.makemasked(ncqdoas[qdvar][:]).astype('f',casting='same_kind')
+            elif ncqdoas[qdvar].dimensions == ('n_alongtrack','3'):
+                dimensions = ["time"]
+                nanvar = nctools.makemasked(ncqdoas[qdvar][:,1]).astype('f',casting='same_kind')
+            elif ncqdoas[qdvar].dimensions == ('n_alongtrack','4'):
+                dimensions = ["time", None]
+                assert hpobj.harpname == "latitude_bounds" or hpobj.harpname == "longitude_bounds"
+                nanvar = nctools.makemasked(ncqdoas[qdvar][:, [1, 3, 2, 0]]). \
+                    astype('f', casting='same_kind')
             else:
                 assert 0, f"unknown variable {qdvar} for this  conversion"
-            hpvar=harp.Variable(nanvar,dimensions, unit=hpobj.units, valid_min=hpobj.valid_min,
+            hpvar=harp.Variable(nanvar, dimensions, unit=hpobj.units, valid_min=hpobj.valid_min,
                                 valid_max=hpobj.valid_max, description=hpobj.description , enum=None)
         else: #non floating point, integer point:
-            if ncqdoas[qdvar].dimensions==('n_alongtrack',):
+            if ncqdoas[qdvar].dimensions == ('n_alongtrack',):
                 datatype=ncqdoas[qdvar].dtype.char
-                if ncqdoas[qdvar].dtype.char=='H':
+                if ncqdoas[qdvar].dtype.char == 'H':
                     datatype='h'
                 nchpvar=ncqdoas[qdvar][:]
                 hpvar=harp.Variable(nchpvar,['time'], unit=hpobj.units, valid_min=hpobj.valid_min, valid_max=hpobj.valid_max, description=hpobj.description, enum=None)
