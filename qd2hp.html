@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qd2hp &mdash; qdoas2harp 1.1.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/my_theme.css?v=43fd341a" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=6f037312"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="aux_imp" href="aux_imp.html" />
+    <link rel="prev" title="Command line tools" href="tools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            qdoas2harp
+          </a>
+              <div class="version">
+                1.1.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main.html">Create Harp compliant qdoas output.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_aux.html">Adding auxiliary information.</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tools.html">Command line tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">qd2hp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="aux_imp.html">aux_imp</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="qd2hp_py.html">Python interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="limit.html">Applications where the tool can be used</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qdoas2harp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tools.html">Command line tools</a></li>
+      <li class="breadcrumb-item active">qd2hp</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/qd2hp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qd2hp">
+<span id="qdref"></span><h1>qd2hp<a class="headerlink" href="#qd2hp" title="Link to this heading"></a></h1>
+<p>qdoas to harp tool</p>
+<div class="highlight-RST notranslate"><div class="highlight"><pre><span></span>Usage:
+    qd2hp  --outdir --slcol &quot;&lt;qdoas_symbol&gt; = &lt;harp_molecule_name&gt;&quot;   &lt;qdoasfile&gt; [--pixcor &lt;ompixcor&gt;]
+
+            Convert a qdoas file &lt;qdoasfile&gt; to a Harp compliant qdoasfile by copying it to the directory &lt;outdir&gt;.
+                Convert all qdoas files in a directory &lt;qdoasdir&gt; to a Harp compliant qdoasfile by copying the files to the directory &lt;outdir&gt;.
+                --outdir directory where to put the output.
+
+                --slcol provide here a  mapping for the  absorber of interest, e.g: &#39;ch2o = HCHO &#39; &#39;so2 = SO2&#39;
+                                on the left side of each expression, the qdoas symbol (for which there exists no naming convention in qdoas) is written and correspond to a molecule symbol given in
+                                        http://stcorp.github.io/harp/doc/html/conventions/variable_names.html (see section supported species)
+
+
+Examples:
+
+ <span class="m">1)</span> This example convert a S5P qdoas output file:
+
+(venv) : ~&gt;   qd2hp   -outdir ./harp_out/2020/08/10 -fitwin w320_h2co_radasref -slcol &quot;ch2o = HCHO &quot; .//2020/08/10/S5P_RPRO_L1B_RA_BD3_20200810T014139_20200810T032308_14637_03_020100_20220707T114433.nc
+
+Note that year/month/day directories for the output have to be created before using qd2hp, otherwise it will fail.
+
+ <span class="m">2)</span> example for an OMI qdoas output file:
+        (venv) : ~&gt;   qd2hp   -outdir ./harp_out/2022/01/02 -slcol &quot;ch2o = HCHO &quot; ./2022/01/02/OMI-Aura_L1-OML1BRUG_2022m0102t0142-o92906_v003-2022m0102t071548.nc  -fitwin &#39;w200&#39; -pixcor
+        ./2022/002/OMI-Aura_L2-OMPIXCOR_2022m0102t0142-o92906_v003-2022m0102t072111.he5
+
+        Note tha the program will fail is not the right (same orbit) file has been provided. The band which is used is read from the qdoas main attributes.
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tools.html" class="btn btn-neutral float-left" title="Command line tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aux_imp.html" class="btn btn-neutral float-right" title="aux_imp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Harp compliant qdoas output. &mdash; qdoas2harp 1.1.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/my_theme.css?v=43fd341a" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=6f037312"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Adding auxiliary information." href="main_aux.html" />
+    <link rel="prev" title="Overview" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            qdoas2harp
+          </a>
+              <div class="version">
+                1.1.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Create Harp compliant qdoas output.</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#layout-of-qdoas-file">Layout of qdoas file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qdoas-to-harp-mapping">Qdoas to Harp mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mapping-of-qdoas-names">Mapping of qdoas names</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mapping-for-omi">Mapping for OMI.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mapping-for-gome2a-b-and-c">Mapping for GOME2A,B and C:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mapping-for-tropomi">Mapping for Tropomi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="main_aux.html">Adding auxiliary information.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Command line tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qd2hp_py.html">Python interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="limit.html">Applications where the tool can be used</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qdoas2harp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Create Harp compliant qdoas output.</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/main.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="create-harp-compliant-qdoas-output">
+<span id="ref1"></span><h1>Create Harp compliant qdoas output.<a class="headerlink" href="#create-harp-compliant-qdoas-output" title="Link to this heading"></a></h1>
+<section id="layout-of-qdoas-file">
+<h2>Layout of qdoas file<a class="headerlink" href="#layout-of-qdoas-file" title="Link to this heading"></a></h2>
+<p>A qdoas file consist typically out of a main group with variables such as geolocations, time, … . The subgroup contains the results of a doas retrieval.  Note that the name of main and subgroup can be freely chosen in qdoas.</p>
+<p>Below in picture <a class="reference internal" href="#qdoasview"><span class="std std-numref">Fig. 1</span></a>  a typical qdoas layout is shown.</p>
+<figure class="align-center" id="qdoasview">
+<a class="reference internal image-reference" href="_images/fig1.png"><img alt="hdfview of typical qdoas layout" src="_images/fig1.png" style="width: 146.5px; height: 439.0px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">qdoas view</span><a class="headerlink" href="#qdoasview" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="qdoas-to-harp-mapping">
+<h2>Qdoas to Harp mapping<a class="headerlink" href="#qdoas-to-harp-mapping" title="Link to this heading"></a></h2>
+<p>A first application is to use the HARP functionalities on a qdoas output file. Therefore we perform some simplifications:</p>
+<ul class="simple">
+<li><p>We split the subgroup into separate files and copy the output in another directory with a filename that gets the suffix of the original qdoas file.</p></li>
+<li><p>geolocations are kept in every output file. A harp  variable is created according to the conventions specified in <a class="reference external" href="http://stcorp.github.io/harp/doc/html/conventions/variable_names.html">http://stcorp.github.io/harp/doc/html/conventions/variable_names.html</a>.</p></li>
+<li><p>One Slant column of interest is chosen. (see <a class="reference internal" href="qd2hp.html#qdref"><span class="std std-ref">qd2hp</span></a> for how this is done in practice). Currently only one slant column is kept, because the retrieval focuses in most cases on one single
+absorber. Also,  since the calculation of the AMF depends on the absorber, we choose to process AMF and VCD only for one slant column  present in each output file. Note that easily multiple output
+files can be generated which differ in the absorber that is chosen.</p></li>
+</ul>
+</section>
+<section id="mapping-of-qdoas-names">
+<span id="mappingref"></span><h2>Mapping of qdoas names<a class="headerlink" href="#mapping-of-qdoas-names" title="Link to this heading"></a></h2>
+<p>We list the cases where a general mapping can be done from qdoas to harp
+variables.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-number">Table 1 </span><span class="caption-text">Mapping of variable names between qdoas and harp names.</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>original name</p></th>
+<th class="head"><p>harp name</p></th>
+<th class="head"><p>unit attribute</p></th>
+<th class="head"><p>qdoas group</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SlCol(&lt;absorber&gt;)</p></td>
+<td><p>&lt;absorber&gt;_column_number_density</p></td>
+<td><p>molecules cm-2</p></td>
+<td><p>qdoas subgroup</p></td>
+</tr>
+<tr class="row-odd"><td><p>SlErr(&lt;absorber&gt;)</p></td>
+<td><p>&lt;absorber&gt;_column_number_density_uncertainty</p></td>
+<td><p>molecules cm-2</p></td>
+<td><p>qdoas subgroup</p></td>
+</tr>
+<tr class="row-even"><td><p>Latitude</p></td>
+<td><p>latitude</p></td>
+<td><p>degree_north</p></td>
+<td><p>qdoas main group</p></td>
+</tr>
+<tr class="row-odd"><td><p>Longitude</p></td>
+<td><p>Longitude</p></td>
+<td><p>degree_east</p></td>
+<td><p>qdoas main group</p></td>
+</tr>
+<tr class="row-even"><td><p>Pixel corner latitudes</p></td>
+<td><p>latitude_bounds</p></td>
+<td><p>degree_north</p></td>
+<td><p>qdoas main group</p></td>
+</tr>
+<tr class="row-odd"><td><p>Pixel corner longitudes</p></td>
+<td><p>longitude_bounds</p></td>
+<td><p>degree_east</p></td>
+<td><p>qdoas main group</p></td>
+</tr>
+<tr class="row-even"><td><p>LoS Azimuth</p></td>
+<td><p>sensor_azimuth_angle</p></td>
+<td><p>units=degree</p></td>
+<td><p>qdoas main group</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoS ZA</p></td>
+<td><p>sensor_zenith_angle</p></td>
+<td><p>degree</p></td>
+<td><p>qdoas main group</p></td>
+</tr>
+<tr class="row-even"><td><p>SZA</p></td>
+<td><p>solar_zenith_angle</p></td>
+<td><p>degree</p></td>
+<td><p>qdoas main group</p></td>
+</tr>
+<tr class="row-odd"><td><p>Solar Azimuth Angle</p></td>
+<td><p>solar_azimuth_angle</p></td>
+<td><p>degree</p></td>
+<td><p>qdoas main group</p></td>
+</tr>
+<tr class="row-even"><td><p>Date &amp; time (YYYYMMDDhhmmss)</p></td>
+<td><p>datetime_start</p></td>
+<td><p>seconds since 2010-01-01</p></td>
+<td><p>qdoas main group</p></td>
+</tr>
+</tbody>
+</table>
+<p>SlCol(&lt;absorber&gt;), SlErr(&lt;absorber&gt;) is the main retrieved slant column of interest. Other slant columns from (pseudo-) absorbers are use in the fitting procedure, but are excluded in the conversion to a qdoas harp
+format.</p>
+<p>How the  mapping is  might depend on the type of instrument. Qdoas2harp takes this into account and works for qdoas output from  GOME-2, OMI
+and tropomi sensors.</p>
+<section id="mapping-for-omi">
+<h3>Mapping for OMI.<a class="headerlink" href="#mapping-for-omi" title="Link to this heading"></a></h3>
+<p>For OMI an aux. file is needed to include latitude, longitude bounds variables.</p>
+<p>In <a class="reference internal" href="#harpomiview"><span class="std std-numref">Fig. 2</span></a> an example is given of an qdoas outputfile after conversion. Note the limited set variables: only geolocations and a slant column of one species with error.</p>
+<figure class="align-center" id="harpomiview">
+<a class="reference internal image-reference" href="_images/fig2.png"><img alt="_images/fig2.png" src="_images/fig2.png" style="width: 539.0px; height: 203.5px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 2 </span><span class="caption-text">hdfview of a converted qdoas ouput file from OMI.</span><a class="headerlink" href="#harpomiview" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>Based on the main attributes: <em>sensor, L1_file, L1_spectral_band</em> the corresponding L2 OMPIXCOR can be found, from which <strong>latitude_bounds</strong> and <strong>longitude_bounds</strong> can be constructed. Note that the
+filepath to the corresponding OMPIXCOR file needs to be provided. (see <a class="reference internal" href="tools.html#ref-cml"><span class="std std-ref">Command line tools</span></a>)</p>
+</section>
+<section id="mapping-for-gome2a-b-and-c">
+<h3>Mapping for GOME2A,B and C:<a class="headerlink" href="#mapping-for-gome2a-b-and-c" title="Link to this heading"></a></h3>
+<p>For the latitude, longitude bounds: the corners ABCD are reordered as BDCA.</p>
+</section>
+<section id="mapping-for-tropomi">
+<h3>Mapping for Tropomi<a class="headerlink" href="#mapping-for-tropomi" title="Link to this heading"></a></h3>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="main_aux.html" class="btn btn-neutral float-right" title="Adding auxiliary information." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

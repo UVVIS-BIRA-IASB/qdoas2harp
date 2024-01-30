@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; qdoas2harp 1.1.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/my_theme.css?v=43fd341a" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=6f037312"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Create Harp compliant qdoas output." href="main.html" />
+    <link rel="prev" title="qdoas2harp documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            qdoas2harp
+          </a>
+              <div class="version">
+                1.1.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="main.html">Create Harp compliant qdoas output.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_aux.html">Adding auxiliary information.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Command line tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="qd2hp_py.html">Python interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="limit.html">Applications where the tool can be used</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">qdoas2harp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>The aim of the qdoas2harp tool is to facilitate the post processing of a qdoas file. Many functionalities of HARP can be used on such a harp compliant output format. One very useful scenario is when
+one want to do some gridding on a qdoas file. Moreover many L2 formats can already be converted to such a Harp format.
+The functionality of this qdoas2harp package consist out of :</p>
+<ul class="simple">
+<li><p>Converting a qdoas file into a harp compliant file. This new file will contain the geolocations and the slant columnn of interest. Many variables which are related to the retrieval are not
+included. Some important metadata (sensor, L1 data file, ) is also added in the output. This functionality is described in <a class="reference internal" href="main.html#ref1"><span class="std std-ref">Create Harp compliant qdoas output.</span></a></p></li>
+<li><p>Starting from this harp qdoas file we can easily add auxiliary info, see <a class="reference internal" href="main_aux.html#ref2"><span class="std std-ref">Adding auxiliary information.</span></a>. This output file is then in a suitable format for the BeAMF tool (<a class="reference external" href="https://uvvis-bira-iasb.github.io/BeAMF/">https://uvvis-bira-iasb.github.io/BeAMF/</a>),
+which can calculate an AMF and a corresponding vertical
+column.</p></li>
+<li><p>Instructions on the theory behind the conversion to a qdoas harp output file, can be found in <a class="reference internal" href="main.html#ref1"><span class="std std-ref">Create Harp compliant qdoas output.</span></a></p></li>
+<li><p>Currently conversion of the output for   GOME-2A, B and C, OMI and tropomi sensors are implemented, but in the future additional instruments can be easily added.</p></li>
+<li><p>The use of the command line tools are described in <a class="reference internal" href="tools.html#ref-cml"><span class="std std-ref">Command line tools</span></a></p></li>
+<li><p>A python interface (which has contains the same functionality as the command line tools) can be found in <a class="reference internal" href="qd2hp_py.html#ref-py"><span class="std std-ref">Python interface</span></a></p></li>
+</ul>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>To use qdoas2harp, first install it using pip, for example in a virt. env. called .venv:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(.venv) $ git clone https://github.com/UVVIS-BIRA-IASB/qdoas2harp
+(.venv) $ cd qdoas2harp
+(.venv) $ pip install .
+</pre></div>
+</div>
+<p>Note that a recent version of pip (for example 23.1.2) may be needed.</p>
+<p>A recent qdoas version (&gt;= 3.5.1)  is needed. Currently qdoas 3.5.1 is not yet released, but a qdoas version from commit number d1c582178… on github should work. (<a class="reference external" href="https://github.com/UVVIS-BIRA-IASB/qdoas">https://github.com/UVVIS-BIRA-IASB/qdoas</a>)</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="qdoas2harp documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="main.html" class="btn btn-neutral float-right" title="Create Harp compliant qdoas output." accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
